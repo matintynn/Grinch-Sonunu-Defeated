@@ -1,0 +1,26 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: rgb(8, 18, 29);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+#gameCanvas {
+    border: 3px solid #c2ddf1;
+    border-radius: 18px;
+    max-width: calc(100vw - 48px);
+    max-height: calc(100vh - 48px);
+    /* box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); */
+}
