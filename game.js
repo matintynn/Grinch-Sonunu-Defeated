@@ -71,6 +71,7 @@ const images = {
     endSceneElement: new Image(),
     bgElement1: new Image(),
     bgElement2: new Image(),
+    sonic: new Image(),
     sonunuNormal: new Image(),
     sonunuRun: new Image(),
     sonunuRunStar: new Image(),
@@ -84,6 +85,9 @@ const images = {
     sonunuReward: new Image(),
     star: new Image()
 };
+
+// set sonic image source
+images.sonic.src = 'assets/sonic.png';
 
 // Set scene image sources
 images.startSceneElement.src = 'assets/start_scene_element.png';
@@ -233,10 +237,9 @@ function drawStartScreen() {
 
 function drawStoryDialog() {
     const storyLines = [
-        'The wicked Grinch Sonunu has stolen the Christmas Star!',
-        'Sonunu Town is in shadow. You, the brave Sonunu,',
-        'must carry the replacement star through icy perils',
-        'to the central tree. Deliver the Star and save Christmas joy!'
+        'Oh no! The Grinch stole the Christmas Star!',
+        'Grab the replacement star and dodge icy chaos.',
+        'Jump on monsters. Collect coins. Save Christmas! 🎄'
     ];
 
     const elapsedTime = Date.now() - startDialogTimer;
@@ -668,6 +671,14 @@ const xmasStar = {
     collected: false
 };
 
+const sonic = {
+    x: 2600,
+    y: GROUND_LEVEL - 220 - 20 - 50, // 20px above the last ice cube
+    width: 50,
+    height: 50,
+    collected: false
+};
+
 // Christmas tree at the end - adjusted for new ground level
 const xmasTree = {
     x: 3400,
@@ -748,18 +759,51 @@ function checkCollisions() {
             }
         }
     });
-    if (player.x < bullet.x + bullet.width &&
-        player.x + player.width > bullet.x &&
-        player.y < bullet.y + bullet.height &&
-        player.y + player.height > bullet.y) {
-        if (gameEndTime === null) {
-            gameEndTime = Date.now();
+
+    // Check bullet collisions - FIXED THIS PART
+    bullets.forEach(bullet => {
+        if (player.x < bullet.x + bullet.width &&
+            player.x + player.width > bullet.x &&
+            player.y < bullet.y + bullet.height &&
+            player.y + player.height > bullet.y) {
+            if (gameEndTime === null) {
+                gameEndTime = Date.now();
+            }
+            currentState = GAME_STATE.GAME_OVER;
         }
-        currentState = GAME_STATE.GAME_OVER;
-    } else (player.y < bullet.y + bullet.height &&
-        player.y + player.height > bullet.y)
-    currentState = GAME_STATE.GAME_OVER;
-};
+    });
+
+    // Check star collision
+    if (!xmasStar.collected &&
+        player.x < xmasStar.x + xmasStar.width &&
+        player.x + player.width > xmasStar.x &&
+        player.y < xmasStar.y + xmasStar.height &&
+        player.y + player.height > xmasStar.y) {
+        xmasStar.collected = true;
+        player.hasStar = true;
+        starCollected = true;
+        playerScore += 2000; // +2000 points for collecting the star
+    }
+
+    // Check win condition (jump on top of Christmas tree)
+    if (player.x < xmasTree.x + xmasTree.width &&
+        player.x + player.width > xmasTree.x &&
+        player.y < xmasTree.y + xmasTree.height &&
+        player.y + player.height > xmasTree.y) {
+
+        // Must land on top of tree
+        if (player.velocityY > 0 && player.y < xmasTree.y + 20) {
+            xmasTree.hasWon = true;
+            currentState = GAME_STATE.WIN_CELEBRATION;
+            celebrationTimer = Date.now();
+            celebrationMessage = "You have successfully saved the Sonunu's Town from demonic Grinch Sonunu!";
+            celebrationCharIndex = 0;
+            if (gameEndTime === null) {
+                gameEndTime = Date.now();
+            }
+        }
+    }
+}
 
 // Check star collision
 if (!xmasStar.collected &&
