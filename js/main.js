@@ -4,7 +4,7 @@
 
 import { loadAllImages } from './imageLoader.js';
 import { createSnowflakes, updateSnowflakes } from './snowEffect.js';
-import { setupKeyboardControls, setupTouchControls, keys } from './utils/input.js';
+import { setupKeyboardControls, setupTouchControls, setupMouseControls, keys } from './utils/input.js';
 import { updatePlayer, resetPlayer, handleJump } from './player.js';
 import { updateCamera, resetCamera, camera } from './camera.js';
 import { updateMonsters, updateBullets, resetMonsters } from './enemies.js';
@@ -21,6 +21,7 @@ import * as GameState from './gameState.js';
 createSnowflakes();
 setupKeyboardControls();
 setupTouchControls();
+setupMouseControls();
 
 // Reset game function
 function resetGame() {

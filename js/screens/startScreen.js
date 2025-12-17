@@ -8,10 +8,12 @@ import { drawGradientBackground, drawNoiseEffect } from '../background.js';
 import { drawSnowflakes } from '../snowEffect.js';
 import * as GameState from '../gameState.js';
 import { themeColors, themeFonts } from '../themeColors.js';
+import { touch, keys } from '../utils/input.js';
 
 // Floating animation state
 let floatingOffset = 0;
 let floatingDirection = 1;
+let startButtonRect = null;
 
 export function drawStartScreen() {
     // Draw gradient background
@@ -45,6 +47,19 @@ export function drawStartScreen() {
     if (!GameState.showStartDialog) {
         // Draw "Press Enter To Start" with border
         drawPressEnterWithBorder();
+        // Handle mobile tap: if a tap occurred inside the button rect, simulate Enter
+        if (touch.tapX !== null && startButtonRect) {
+            const tx = touch.tapX;
+            const ty = touch.tapY;
+            if (tx >= startButtonRect.x && tx <= startButtonRect.x + startButtonRect.width &&
+                ty >= startButtonRect.y && ty <= startButtonRect.y + startButtonRect.height) {
+                // simulate Enter key press for existing logic
+                keys['Enter'] = true;
+            }
+            // consume tap
+            touch.tapX = null;
+            touch.tapY = null;
+        }
     } else {
         // Show story dialog with typewriter effect
         drawStoryDialog();
@@ -108,6 +123,9 @@ function drawPressEnterWithBorder() {
     ctx.shadowBlur = 15;
     ctx.fillText(text, x, y);
     ctx.shadowBlur = 0;
+
+    // store button rect for hit testing
+    startButtonRect = { x: rectX, y: rectY, width: rectWidth, height: rectHeight };
 }
 
 function drawStoryDialog() {
