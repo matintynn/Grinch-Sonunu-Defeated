@@ -14,6 +14,7 @@ import { touch, keys } from '../utils/input.js';
 let floatingOffset = 0;
 let floatingDirection = 1;
 let startButtonRect = null;
+let storyButtonRect = null;
 
 export function drawStartScreen() {
     // Draw gradient background
@@ -63,6 +64,17 @@ export function drawStartScreen() {
     } else {
         // Show story dialog with typewriter effect
         drawStoryDialog();
+        // Handle mobile tap on story continue prompt
+        if (touch.tapX !== null && storyButtonRect) {
+            const tx = touch.tapX;
+            const ty = touch.tapY;
+            if (tx >= storyButtonRect.x && tx <= storyButtonRect.x + storyButtonRect.width &&
+                ty >= storyButtonRect.y && ty <= storyButtonRect.y + storyButtonRect.height) {
+                keys['Enter'] = true;
+            }
+            touch.tapX = null;
+            touch.tapY = null;
+        }
     }
 }
 
@@ -205,6 +217,17 @@ function drawStoryDialog() {
     if (charsToShow >= fullText.length) {
         ctx.fillStyle = themeColors.yellowPrimary;
         ctx.font = `bold ${themeFonts.medium} ${themeFonts.primary}`;
-        ctx.fillText('Enter to Rescue X-mas', canvas.width / 2, boxY + boxHeight + 25);
+        const promptX = canvas.width / 2;
+        const promptY = boxY + boxHeight + 25;
+        ctx.fillText('Enter to Rescue X-mas', promptX, promptY);
+
+        // measure prompt and set rect for hit testing
+        const pm = ctx.measureText('Enter to Rescue X-mas');
+        const pad = 20;
+        const pWidth = pm.width + pad * 2;
+        const pHeight = parseInt(themeFonts.medium) + pad;
+        const rectX = promptX - pWidth / 2;
+        const rectY = promptY - pHeight;
+        storyButtonRect = { x: rectX, y: rectY, width: pWidth, height: pHeight };
     }
 }
