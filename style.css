@@ -1,3 +1,51 @@
+/* ============================================
+   CSS VARIABLES - CUSTOMIZE COLORS & FONTS HERE
+   ============================================ */
+
+:root {
+    /* PRIMARY COLORS */
+    --color-primary-gold: #efcc03;
+    --color-primary-white: #FFFFFF;
+    --color-primary-red: #e22020;
+    --color-primary-yellow: #efcc03;
+
+    /* BACKGROUND COLORS */
+    --color-bg-gradient-top: #01172F;
+    --color-bg-gradient-bottom: #010D1B;
+    --color-bg-dark: #050f18;
+    --color-bg-ground: #0b1b28;
+    --color-bg-dialog: rgba(0, 0, 0, 0.85);
+    --color-bg-dialog-dark: rgba(0, 0, 0, 0.8);
+    --color-bg-dialog-shadow: rgba(0, 0, 0, 0.3);
+    --color-bg-overlay: rgba(0, 0, 0, 0.7);
+
+    /* ACCENT COLORS */
+    --color-accent-border: #c2ddf1;
+    --color-accent-border-dialog: #efcc03;
+    --color-accent-snow: rgba(255, 255, 255, 0.948);
+
+    /* FONTS */
+    --font-primary: Arial, sans-serif;
+    --font-fancy: "Space Grotesk", Arial, sans-serif;
+
+    /* FONT SIZES */
+    --font-size-small: 12px;
+    --font-size-medium: 16px;
+    --font-size-large: 18px;
+    --font-size-xlarge: 20px;
+    --font-size-huge: 24px;
+    --font-size-title: 36px;
+    --font-size-gameover: 72px;
+
+    /* TRANSPARENCY */
+    --opacity-full: 1;
+    --opacity-high: 0.85;
+    --opacity-medium: 0.8;
+    --opacity-low: 0.7;
+    --opacity-verylow: 0.3;
+    --opacity-dialog: 0.03;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -5,7 +53,7 @@
 }
 
 body {
-    background-color: rgb(8, 18, 29);
+    background-color: var(--color-bg-dark);
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -18,9 +66,20 @@ body {
 }
 
 #gameCanvas {
-    border: 3px solid #c2ddf1;
-    border-radius: 18px;
-    max-width: calc(100vw - 48px);
-    max-height: calc(100vh - 48px);
+    border: 3px solid var(--color-accent-border);
+    border-radius: 24px;
+    max-width: calc(100vw - 10vw);
+    max-height: calc(100vh - 10vh);
     /* box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); */
+}
+
+/* Styling for any HTML buttons that may be added or used by the game UI */
+button,
+.button,
+.btn,
+.game-button,
+input[type="button"],
+input[type="submit"] {
+    border: 1px solid var(--color-primary-white);
+    border-radius: 16px;
 }
