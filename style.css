@@ -13,7 +13,7 @@
     --color-bg-gradient-top: #01172F;
     --color-bg-gradient-bottom: #010D1B;
     --color-bg-dark: #050f18;
-    --color-bg-ground: #0b1b28;
+    --color-bg-ground: #162d4d;
     --color-bg-dialog: rgba(0, 0, 0, 0.85);
     --color-bg-dialog-dark: rgba(0, 0, 0, 0.8);
     --color-bg-dialog-shadow: rgba(0, 0, 0, 0.3);
@@ -22,10 +22,10 @@
     /* ACCENT COLORS */
     --color-accent-border: #c2ddf1;
     --color-accent-border-dialog: #efcc03;
-    --color-accent-snow: rgba(255, 255, 255, 0.948);
+    --color-accent-snow: rgba(254, 244, 244, 0.985);
 
     /* FONTS */
-    --font-primary: Arial, sans-serif;
+    --font-primary: "Space Grotesk", Arial, sans-serif;
     --font-fancy: "Space Grotesk", Arial, sans-serif;
 
     /* FONT SIZES */

@@ -1,438 +1,340 @@
-# Game Customization Guide
+# Style Customization Guide
 
-A quick reference for modifying game colors, enemies, obstacles, collectibles, difficulty, and more.
+**Complete guide for customizing colors, fonts, visual styling, and UI elements.**
 
 ---
 
-## 1. COLORS & VISUAL STYLING
+## Quick Start: Edit `style.css`
 
-### Background & Ground Colors
-**File:** `js/drawing.js`
+**All visual styling is centralized in `style.css` using CSS variables.** Changes to colors, fonts, and sizes automatically apply throughout the game via the `themeColors`, `themeFonts`, and `themeOpacity` objects in `js/themeColors.js`.
 
-- **Gradient background** (start & game screens) — Lines ~40-45
-  ```javascript
-  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, '#01172F');  // Top color
-  gradient.addColorStop(1, '#010D1B');  // Bottom color
-  ```
+---
 
-- **Ground color** — Lines ~50-52
-  ```javascript
-  ctx.fillStyle = '#1a3a52';  // Dark snow color
-  ctx.fillRect(0, GROUND_LEVEL, canvas.width, GROUND_HEIGHT);
-  ```
+## 1. COLOR CUSTOMIZATION
 
-### Text Colors
-**File:** `js/drawing.js`
+### Edit Colors in `style.css`
+**File:** `style.css` — Lines 1-30 (`:root` section)
 
-- **UI text (Score, Instructions)** — Lines ~180-190
-  ```javascript
-  ctx.fillStyle = '#FFD700';  // Gold color for score/instructions
-  ```
+All game colors are defined as CSS variables. Simply change the hex/rgba values:
 
-- **Dialog box colors** — Lines ~95-110
-  ```javascript
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';  // Dialog background
-  ctx.strokeStyle = 'gold';               // Dialog border
-  ```
+```css
+:root {
+    /* PRIMARY COLORS */
+    --color-primary-gold: #efcc03;      /* UI text, score, titles */
+    --color-primary-white: #FFFFFF;      /* General text */
+    --color-primary-red: #e22020;        /* Game Over text */
+    --color-primary-yellow: #efcc03;     /* Accent highlights */
 
-- **Game Over screen** — Lines ~210-220
-  ```javascript
-  ctx.fillStyle = 'red';  // "GAME OVER" text
-  ```
+    /* BACKGROUND COLORS */
+    --color-bg-gradient-top: #01172F;    /* Sky gradient top */
+    --color-bg-gradient-bottom: #010D1B; /* Sky gradient bottom */
+    --color-bg-dark: #050f18;            /* Body background */
+    --color-bg-ground: #0b1b28;          /* Ground/snow color */
+    
+    /* DIALOG BOXES */
+    --color-bg-dialog: rgba(0, 0, 0, 0.85);        /* Story dialogs */
+    --color-bg-dialog-dark: rgba(0, 0, 0, 0.8);    /* Win celebration */
+    --color-bg-dialog-shadow: rgba(0, 0, 0, 0.3);  /* Shadow effects */
+    --color-bg-overlay: rgba(0, 0, 0, 0.7);        /* Game Over overlay */
 
-### Canvas Border (CSS)
-**File:** `style.css` — Lines ~18-21
+    /* ACCENT COLORS */
+    --color-accent-border: #c2ddf1;         /* Canvas border */
+    --color-accent-border-dialog: #efcc03;  /* Dialog borders */
+    --color-accent-snow: rgba(255, 255, 255, 0.948); /* Snowflakes */
+}
+```
+
+### How Colors Are Applied
+
+Colors automatically sync from CSS to JavaScript via `js/themeColors.js`:
+
+- **Score text:** Uses `themeColors.goldPrimary` → `--color-primary-gold`
+- **Background gradient:** Uses `themeColors.bgGradientTop` and `bgGradientBottom`
+- **Snowflakes:** Uses `themeColors.accentSnow`
+- **Dialog boxes:** Uses `themeColors.bgDialog` and `accentBorderDialog`
+
+**No JavaScript editing needed!** Just change CSS variables.
+
+---
+
+## 2. FONT CUSTOMIZATION
+
+### Edit Fonts in `style.css`
+**File:** `style.css` — Lines 22-36
+
+```css
+:root {
+    /* FONT FAMILIES */
+    --font-primary: Arial, sans-serif;              /* General text */
+    --font-fancy: "Space Grotesk", Arial, sans-serif; /* Titles, Game Over */
+
+    /* FONT SIZES */
+    --font-size-small: 12px;      /* Small instructions */
+    --font-size-medium: 16px;     /* Story dialog text */
+    --font-size-large: 18px;      /* Win celebration text */
+    --font-size-xlarge: 20px;     /* Score display */
+    --font-size-huge: 24px;       /* Press ENTER prompts */
+    --font-size-title: 36px;      /* Victory titles */
+    --font-size-gameover: 72px;   /* GAME OVER screen */
+}
+```
+
+### How Fonts Are Applied
+
+Fonts sync automatically via `js/themeColors.js`:
+
+- **Score:** `font: bold ${themeFonts.xlarge} ${themeFonts.primary}`
+- **Game Over:** `font: bold ${themeFonts.gameover} ${themeFonts.fancy}`
+- **Instructions:** `font: ${themeFonts.small} ${themeFonts.primary}`
+
+**To change a font globally:** Edit the CSS variable in `style.css`.
+
+**To add a custom font:**
+1. Add font link to `index.html` `<head>`:
+   ```html
+   <link href="https://fonts.googleapis.com/css2?family=YourFont&display=swap" rel="stylesheet">
+   ```
+2. Update `--font-fancy` or `--font-primary` in `style.css`:
+   ```css
+   --font-fancy: "YourFont", Arial, sans-serif;
+   ```
+
+---
+
+## 3. TRANSPARENCY/OPACITY
+
+### Edit Opacity Values in `style.css`
+**File:** `style.css` — Lines 38-45
+
+```css
+:root {
+    /* TRANSPARENCY LEVELS */
+    --opacity-full: 1;          /* 100% opaque */
+    --opacity-high: 0.85;       /* Dialog backgrounds */
+    --opacity-medium: 0.8;      /* Win celebration overlay */
+    --opacity-low: 0.7;         /* Game Over overlay */
+    --opacity-verylow: 0.3;     /* Shadows */
+    --opacity-dialog: 0.03;     /* Noise effect intensity */
+}
+```
+
+Used in:
+- **Dialog backgrounds:** `themeOpacity.high` (0.85)
+- **Noise effect:** `themeOpacity.dialog` (0.03) — controls visual grain
+- **Overlays:** `themeOpacity.low` (0.7)
+
+---
+
+## 4. CANVAS BORDER & SHAPE
+
+### Edit Canvas Border in `style.css`
+**File:** `style.css` — Lines 68-72
+
 ```css
 #gameCanvas {
-    border: 3px solid #c2ddf1;  /* Change color and width */
-    border-radius: 18px;        /* Change roundness */
+    border: 3px solid var(--color-accent-border);  /* Border width & color */
+    border-radius: 24px;                           /* Corner roundness */
+    max-width: calc(100vw - 10vw);                 /* Responsive width */
+    max-height: calc(100vh - 10vh);                /* Responsive height */
+}
+```
+
+**Customization examples:**
+- **Thicker border:** `border: 5px solid var(--color-accent-border);`
+- **Sharp corners:** `border-radius: 0px;`
+- **Colored border:** Change `--color-accent-border` in `:root`
+- **Glowing border:** Add `box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);`
+
+---
+
+## 5. BACKGROUND EFFECTS
+
+### Gradient Background
+**Controlled by:** `--color-bg-gradient-top` and `--color-bg-gradient-bottom`
+
+Change these in `style.css` to modify the sky:
+```css
+--color-bg-gradient-top: #01172F;    /* Night sky (top) */
+--color-bg-gradient-bottom: #010D1B; /* Night sky (bottom) */
+```
+
+**Example themes:**
+- **Sunrise:** Top `#ff6b6b`, Bottom `#ffd93d`
+- **Day:** Top `#87CEEB`, Bottom `#E0F6FF`
+- **Sunset:** Top `#ff6347`, Bottom `#4b0082`
+
+### Ground Color
+**Controlled by:** `--color-bg-ground`
+
+```css
+--color-bg-ground: #0b1b28;  /* Dark snow/ground */
+```
+
+### Snowflake Color
+**Controlled by:** `--color-accent-snow`
+
+```css
+--color-accent-snow: rgba(255, 255, 255, 0.948);  /* White snowflakes */
+```
+
+For colored snow (e.g., golden snowflakes):
+```css
+--color-accent-snow: rgba(255, 215, 0, 0.8);
+```
+
+---
+
+## 6. UI TEXT COLORS BY SCREEN
+
+### Start Screen
+- **Story dialog text:** `themeColors.whitePrimary`
+- **Dialog border:** `themeColors.accentBorderDialog` (gold)
+- **"Press ENTER" prompt:** `themeColors.yellowPrimary`
+
+### Game Screen
+- **Score:** `themeColors.goldPrimary`
+- **Instructions (← → Move):** `themeColors.goldPrimary`
+
+### Game Over Screen
+- **"GAME OVER" text:** `themeColors.redPrimary`
+- **Score display:** `themeColors.whitePrimary`
+- **"Press ENTER" prompt:** `themeColors.whitePrimary`
+
+### Win Screens
+- **Celebration message:** `themeColors.whitePrimary`
+- **"Christmas Saved!" title:** `themeColors.accentBorderDialog` (gold)
+- **Score & bonus:** `themeColors.goldPrimary`
+- **Reward card border:** `themeColors.accentBorderDialog`
+
+---
+
+## 7. COMMON CUSTOMIZATION SCENARIOS
+
+### Scenario 1: Dark Mode → Light Mode
+
+**In `style.css`:**
+```css
+/* Change these variables */
+--color-bg-gradient-top: #87CEEB;      /* Light blue sky */
+--color-bg-gradient-bottom: #E0F6FF;   /* Lighter blue */
+--color-bg-dark: #f0f8ff;              /* Light body */
+--color-bg-ground: #ffffff;            /* White ground */
+--color-primary-gold: #d4af37;         /* Darker gold for contrast */
+--color-primary-white: #000000;        /* Black text */
+--color-accent-snow: rgba(200, 200, 255, 0.9); /* Light blue snow */
+```
+
+### Scenario 2: Halloween Theme
+
+```css
+--color-bg-gradient-top: #1a0033;      /* Dark purple */
+--color-bg-gradient-bottom: #000000;   /* Black */
+--color-bg-ground: #2d1b00;            /* Dark brown */
+--color-primary-gold: #ff6600;         /* Orange */
+--color-primary-yellow: #ff6600;       /* Orange accents */
+--color-accent-border-dialog: #ff6600; /* Orange borders */
+--color-accent-snow: rgba(255, 102, 0, 0.5); /* Orange particles */
+```
+
+### Scenario 3: Neon/Cyberpunk Theme
+
+```css
+--color-bg-gradient-top: #0a0e27;      /* Dark navy */
+--color-bg-gradient-bottom: #000000;   /* Black */
+--color-bg-ground: #1a1a2e;            /* Dark purple-gray */
+--color-primary-gold: #00ffff;         /* Cyan */
+--color-primary-yellow: #ff00ff;       /* Magenta */
+--color-accent-border: #00ffff;        /* Cyan border */
+--color-accent-border-dialog: #ff00ff; /* Magenta dialogs */
+--color-accent-snow: rgba(0, 255, 255, 0.8); /* Cyan particles */
+```
+
+---
+
+## 8. BUTTON STYLING (If Added)
+
+**File:** `style.css` — Lines 74-82
+
+If you add HTML buttons to the game UI:
+```css
+button, .button, .btn {
+    border: 1px solid var(--color-primary-white);
+    border-radius: 16px;
+    /* Add more styles as needed */
 }
 ```
 
 ---
 
-## 2. PLAYER PHYSICS & JUMPING
+## 9. ADVANCED: Dynamic Theme Switching
 
-**File:** `js/player.js`
+To change themes dynamically at runtime:
 
-### Player Properties — Lines ~10-25
+**1. Add a theme switcher function in `js/themeColors.js`:**
+Already included! Use `refreshTheme()` to reload all CSS variables after changing them.
+
+**2. Create a theme toggle:**
 ```javascript
-const player = {
-    speed: 5,                    // CHANGE: Horizontal movement speed (increase = faster)
-    gravity: 0.6,               // CHANGE: Fall speed (increase = faster falling)
-    maxJumps: 3,                // CHANGE: Number of jumps allowed (3 = double jump + 1)
-    jumpHeights: [-7, -11, -15] // CHANGE: Power for each jump (more negative = higher)
-};
-```
-
-### Jump Handler
-**File:** `js/input.js` — Lines ~30-40
-```javascript
-if (e.key === 'ArrowUp' && currentState === GAME_STATE.PLAYING) {
-    if (player.jumpCount < player.maxJumps) {
-        player.velocityY = player.jumpHeights[player.jumpCount];
-        // Increase or decrease jumpHeights in player.js to make jumps higher/lower
-    }
-}
+// Example: Toggle to dark theme
+document.documentElement.style.setProperty('--color-bg-gradient-top', '#000000');
+document.documentElement.style.setProperty('--color-bg-gradient-bottom', '#1a1a1a');
+refreshTheme(); // Reload theme in game
 ```
 
 ---
 
-## 3. ENEMIES & MONSTERS
+## 10. TROUBLESHOOTING
 
-**File:** `js/enemies.js`
+**Colors not changing?**
+- Clear browser cache and hard refresh (Ctrl+Shift+R / Cmd+Shift+R)
+- Verify CSS variable names match exactly (case-sensitive)
+- Check `js/themeColors.js` loads before other JS files
 
-### Add New Monster — Lines ~1-80
-Find the `monsters` array and add a new object:
-```javascript
-export const monsters = [
-    // Existing monsters...
-    {
-        x: 500,                    // CHANGE: Starting X position
-        y: GROUND_LEVEL - 80,      // CHANGE: Starting Y position
-        width: 80,                 // CHANGE: Size
-        height: 80,
-        shootInterval: 1500,       // CHANGE: Time between shots (ms) — lower = faster
-        alive: true,
-        jumps: true,               // CHANGE: true = monster jumps, false = stays still
-        velocityY: 0,
-        gravity: 0.6,              // CHANGE: Jump gravity
-        jumpPower: -15,            // CHANGE: Jump strength (more negative = higher)
-        jumpInterval: 2000,        // CHANGE: Time between jumps (ms)
-        isChallenge: false,        // CHANGE: true = harder boss monster
-        shootDistance: 600         // CHANGE: (boss only) How far to shoot at player
-    }
-];
-```
+**Fonts not loading?**
+- Verify font link in `index.html` `<head>`
+- Check font name spelling in `--font-fancy` or `--font-primary`
+- Use browser DevTools to confirm font loads
 
-### Adjust Monster Bullets
-**File:** `js/enemies.js` — Lines ~100-130 (`updateMonsters` function)
-```javascript
-// Normal monster bullet speed
-bullets.push({
-    x: monster.x,
-    y: monster.y + monster.height / 2,
-    width: 24,
-    height: 24,
-    speed: -8  // CHANGE: -8 = slow, -12 = fast, -15 = very fast
-});
-```
-
-### Monster Points
-**File:** `js/utils/collision.js` — Lines ~65-70
-```javascript
-GameState.addScore(500);  // CHANGE: Points for killing a monster
-```
+**Opacity not working?**
+- Opacity values must be 0-1 (0.85, not 85)
+- RGBA colors need opacity as 4th value: `rgba(0, 0, 0, 0.85)`
 
 ---
 
-## 4. OBSTACLES (ICE CUBES)
+## 11. COLOR REFERENCE TABLE
 
-**File:** `js/obstacles.js`
-
-### Add New Ice Cube Obstacle — Lines ~1-60
-Find the `iceCubes` array and add:
-```javascript
-export const iceCubes = [
-    // Existing cubes...
-    { 
-        x: 2000,              // CHANGE: X position
-        y: GROUND_LEVEL - 42, // CHANGE: Y position (adjust height)
-        width: 50,            // CHANGE: Size
-        height: 50,
-        type: 1
-    }
-];
-```
-
-### Ice Cube Points
-**File:** `js/utils/collision.js` — Lines ~35-38
-```javascript
-if (!GameState.iceCubesVisited.includes(index)) {
-    GameState.addIceCubeVisited(index);
-    GameState.addScore(50);  // CHANGE: Points per cube stepped on
-}
-```
+| CSS Variable | Usage | Default Value |
+|--------------|-------|---------------|
+| `--color-primary-gold` | Score, UI highlights | `#efcc03` |
+| `--color-primary-white` | General text | `#FFFFFF` |
+| `--color-primary-red` | Game Over title | `#e22020` |
+| `--color-primary-yellow` | Accent highlights | `#efcc03` |
+| `--color-bg-gradient-top` | Sky top | `#01172F` |
+| `--color-bg-gradient-bottom` | Sky bottom | `#010D1B` |
+| `--color-bg-ground` | Ground/snow | `#0b1b28` |
+| `--color-bg-dialog` | Story dialogs | `rgba(0,0,0,0.85)` |
+| `--color-accent-border` | Canvas border | `#c2ddf1` |
+| `--color-accent-border-dialog` | Dialog borders | `#efcc03` |
+| `--color-accent-snow` | Snowflakes | `rgba(255,255,255,0.948)` |
 
 ---
 
-## 5. COLLECTIBLES (STAR, TREE, etc.)
+## 12. FONT REFERENCE TABLE
 
-**File:** `js/collectibles.js`
-
-### Christmas Star Position & Size — Lines ~1-15
-```javascript
-export const xmasStar = {
-    x: 3200,                    // CHANGE: Horizontal position
-    y: GROUND_LEVEL - 220,      // CHANGE: Vertical position (height above ground)
-    width: 50,                  // CHANGE: Size
-    height: 50,
-    collected: false
-};
-```
-
-### Christmas Tree (Goal) — Lines ~20-30
-```javascript
-export const xmasTree = {
-    x: 3400,              // CHANGE: Finish line X position
-    y: GROUND_LEVEL - 180,// CHANGE: Y position (height)
-    width: 180,           // CHANGE: Size
-    height: 180,
-    hasWon: false
-};
-```
-
-### Star Collection Points
-**File:** `js/utils/collision.js` — Lines ~100-105
-```javascript
-GameState.addScore(2000);  // CHANGE: Points for collecting star
-```
-
-### Add More Collectibles
-1. Create a new object in `js/collectibles.js`:
-   ```javascript
-   export const powerUp = {
-       x: 1500,
-       y: GROUND_LEVEL - 100,
-       width: 40,
-       height: 40,
-       collected: false
-   };
-   ```
-
-2. Add collision check in `js/utils/collision.js`:
-   ```javascript
-   // Check power-up collision
-   if (!powerUp.collected &&
-       player.x < powerUp.x + powerUp.width &&
-       player.x + player.width > powerUp.x &&
-       player.y < powerUp.y + powerUp.height &&
-       player.y + player.height > powerUp.y) {
-       powerUp.collected = true;
-       GameState.addScore(500);  // Points for collecting
-   }
-   ```
-
-3. Draw it in `js/drawing.js` (game drawing function):
-   ```javascript
-   if (!powerUp.collected) {
-       ctx.drawImage(images.powerUp, powerUp.x, powerUp.y, powerUp.width, powerUp.height);
-   }
-   ```
-
----
-
-## 6. GAME LENGTH & DIFFICULTY
-
-### World Length
-**File:** `js/obstacles.js` — Lines ~50-60 (last ice cube position)
-- Extend the rightmost cube `x` position to make the game longer
-- Example: Change `x: 3200` to `x: 5000` to add more travel distance
-
-### Add Timer/Speed Bonus
-**File:** `js/drawing.js` — Lines ~230-245 (endScene drawing)
-```javascript
-const elapsedTime = (gameEndTime - gameStartTime) / 1000;
-if (elapsedTime < 20) {
-    bonusScore += 1000;  // CHANGE: Bonus points for speed
-}
-```
-
-### Adjust Difficulty
-- **Increase monster shooting:** Lower `shootInterval` in `js/enemies.js` (e.g., 800 instead of 1500)
-- **Faster bullets:** Change `speed: -8` to `speed: -12` in `js/enemies.js`
-- **More obstacles:** Add more cubes to `iceCubes` array in `js/obstacles.js`
-
----
-
-## 7. MUSIC & SOUND EFFECTS
-
-**File:** `js/audio.js` (create this file if it doesn't exist)
-
-### Basic Sound Setup
-```javascript
-export const sounds = {
-    jump: new Audio('assets/jump.mp3'),
-    collect: new Audio('assets/collect.mp3'),
-    gameOver: new Audio('assets/gameover.mp3'),
-    win: new Audio('assets/win.mp3'),
-    bgm: new Audio('assets/background.mp3')  // Background music
-};
-
-export function playSound(soundName) {
-    sounds[soundName].currentTime = 0;
-    sounds[soundName].play();
-}
-```
-
-### Add Sounds to Game
-
-**Jump sound:**
-**File:** `js/input.js` — Lines ~30-40
-```javascript
-if (e.key === 'ArrowUp' && currentState === GAME_STATE.PLAYING) {
-    if (player.jumpCount < player.maxJumps) {
-        player.velocityY = player.jumpHeights[player.jumpCount];
-        // ADD THIS LINE:
-        playSound('jump');
-    }
-}
-```
-
-**Collect star sound:**
-**File:** `js/utils/collision.js` — Lines ~100-105
-```javascript
-if (xmasStar.collected) {
-    xmasStar.collected = true;
-    // ADD THIS LINE:
-    playSound('collect');
-    GameState.addScore(2000);
-}
-```
-
-**Background music:**
-**File:** `js/main.js` (game loop start)
-```javascript
-// At start of gameLoop or in init:
-sounds.bgm.loop = true;
-sounds.bgm.volume = 0.5;  // CHANGE: 0-1 for volume
-sounds.bgm.play();
-```
-
-### Sound File Locations
-Place audio files in: `assets/` folder
-- `jump.mp3` — Jump sound
-- `collect.mp3` — Item collection
-- `gameover.mp3` — Game over sound
-- `win.mp3` — Victory sound
-- `background.mp3` — Background music loop
-
----
-
-## 8. GAME STATES & SCREENS
-
-### Modify Start Screen Dialog
-**File:** `js/drawing.js` — Lines ~60-80
-```javascript
-const storyLines = [
-    'Oh no! The Grinch stole the Christmas Star!',    // CHANGE: Story text
-    'Grab the replacement star and dodge icy chaos.',
-    'Jump on monsters. Collect coins. Save Christmas! 🎄'
-];
-```
-
-### Modify Victory Message
-**File:** `js/utils/collision.js` — Lines ~120-125
-```javascript
-GameState.setCelebrationMessage(
-    "You have successfully saved the Sonunu's Town!"  // CHANGE: Victory text
-);
-```
-
-### Modify Game Over Screen
-**File:** `js/drawing.js` — Lines ~210-225
-```javascript
-ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 80);  // CHANGE: Text
-ctx.fillText(`Score: ${playerScore}`, canvas.width / 2, canvas.height / 2 + 20);
-```
-
----
-
-## 9. IMAGES & ASSETS
-
-**File:** `js/setup.js` — Lines ~10-50 (image definitions)
-
-Add or modify images:
-```javascript
-export const images = {
-    sonunuNormal: new Image(),
-    monster: new Image(),
-    // ADD NEW IMAGES:
-    powerUp: new Image(),
-    boss: new Image()
-};
-
-// Set image sources
-images.powerUp.src = 'assets/powerup.png';
-images.boss.src = 'assets/boss.png';
-```
-
-Place image files in: `assets/` folder
-
----
-
-## 10. QUICK ADJUSTMENT CHECKLIST
-
-| What to Change | File | Lines | What to Modify |
-|---|---|---|---|
-| Player speed | `js/player.js` | ~15 | `speed: 5` |
-| Jump power | `js/player.js` | ~22 | `jumpHeights: [-7, -11, -15]` |
-| Gravity | `js/player.js` | ~16 | `gravity: 0.6` |
-| Monster position | `js/enemies.js` | ~10-50 | `x:` and `y:` properties |
-| Monster shooting | `js/enemies.js` | ~20 | `shootInterval: 1500` |
-| Bullet speed | `js/enemies.js` | ~100 | `speed: -8` |
-| Obstacle position | `js/obstacles.js` | ~10-50 | `x:` and `y:` properties |
-| Star position | `js/collectibles.js` | ~5 | `x:` and `y:` properties |
-| Tree position | `js/collectibles.js` | ~15 | `x:` and `y:` properties |
-| Background color | `js/drawing.js` | ~43 | `gradient.addColorStop()` |
-| UI text color | `js/drawing.js` | ~185 | `ctx.fillStyle` |
-| Points per cube | `js/utils/collision.js` | ~37 | `GameState.addScore(50)` |
-| Points for star | `js/utils/collision.js` | ~103 | `GameState.addScore(2000)` |
-| Points for monster | `js/utils/collision.js` | ~68 | `GameState.addScore(500)` |
-
----
-
-## 11. EXAMPLE: ADD A NEW LEVEL SECTION
-
-1. **Add obstacles in `js/obstacles.js`:**
-   ```javascript
-   // Level 7 (new section)
-   { x: 4000, y: GROUND_LEVEL - 42, width: 50, height: 50, type: 1 },
-   { x: 4100, y: GROUND_LEVEL - 78, width: 50, height: 50, type: 1 },
-   ```
-
-2. **Add monster in `js/enemies.js`:**
-   ```javascript
-   {
-       x: 4200,
-       y: GROUND_LEVEL - 80,
-       width: 80,
-       height: 80,
-       shootInterval: 1200,
-       alive: true,
-       jumps: true,
-       // ... rest of properties
-   }
-   ```
-
-3. **Move tree further in `js/collectibles.js`:**
-   ```javascript
-   export const xmasTree = {
-       x: 4400,  // Changed from 3400
-       // ... rest
-   }
-   ```
-
----
-
-## 12. TROUBLESHOOTING COMMON CHANGES
-
-**Monster not shooting?**
-- Check `shootInterval > 0` in `js/enemies.js`
-- Check boss monster has `isChallenge: true` if you only want boss to shoot
-
-**Player falls through ground?**
-- Verify `GROUND_LEVEL` in `js/config.js` matches canvas height calculation
-
-**Collectible not appearing?**
-- Add draw command in `js/drawing.js` game drawing function
-- Check image is loaded in `js/setup.js`
-
-**Obstacles not blocking?**
-- Verify collision check exists in `js/utils/collision.js`
-- Check `x`, `y`, `width`, `height` are correct
+| CSS Variable | Usage | Default Value |
+|--------------|-------|---------------|
+| `--font-primary` | General text | `Arial, sans-serif` |
+| `--font-fancy` | Titles, Game Over | `"Space Grotesk", Arial` |
+| `--font-size-small` | Small text | `12px` |
+| `--font-size-medium` | Dialog text | `16px` |
+| `--font-size-large` | Win messages | `18px` |
+| `--font-size-xlarge` | Score | `20px` |
+| `--font-size-huge` | Press ENTER | `24px` |
+| `--font-size-title` | Victory titles | `36px` |
+| `--font-size-gameover` | GAME OVER | `72px` |
 
 ---
 
 **Last Updated:** December 17, 2025
+
+**Pro Tip:** Create multiple CSS files (e.g., `theme-dark.css`, `theme-light.css`) and swap them to quickly switch between complete theme presets!

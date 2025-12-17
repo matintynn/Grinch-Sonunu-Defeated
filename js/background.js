@@ -28,4 +28,8 @@ export function drawBackgroundElements() {
     ctx.drawImage(images.bgElement1, 1600, GROUND_LEVEL - bgScale, 300, bgScale);
     ctx.drawImage(images.bgElement2, 2400, GROUND_LEVEL - bgScale, 300, bgScale);
     ctx.drawImage(images.bgElement1, 3200, GROUND_LEVEL - bgScale, 300, bgScale);
+    // Additional 3 bg_element2 at varied positions
+    ctx.drawImage(images.bgElement2, 1100, GROUND_LEVEL - bgScale, 300, bgScale);
+    ctx.drawImage(images.bgElement2, 2000, GROUND_LEVEL - bgScale, 300, bgScale);
+    ctx.drawImage(images.bgElement2, 2900, GROUND_LEVEL - bgScale, 300, bgScale);
 }

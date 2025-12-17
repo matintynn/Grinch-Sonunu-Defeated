@@ -13,6 +13,8 @@ export let playerScore = 0;
 export let monstersKilled = 0;
 export let iceCubesVisited = [];
 export let starCollected = false;
+export let sonicCollected = false;
+export let levelEnded = false;
 
 export function setCurrentState(state) {
     currentState = state;
@@ -63,6 +65,8 @@ export function resetGameState() {
     monstersKilled = 0;
     iceCubesVisited = [];
     starCollected = false;
+    sonicCollected = false;
+    levelEnded = false;
     celebrationTimer = 0;
     celebrationCharIndex = 0;
     rewardSceneStartTime = null;
@@ -72,4 +76,12 @@ export function resetGameState() {
 
 export function setStarCollected(value) {
     starCollected = value;
+}
+
+export function setSonicCollected(value) {
+    sonicCollected = value;
+}
+
+export function setLevelEnded(value) {
+    levelEnded = value;
 }

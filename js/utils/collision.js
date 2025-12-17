@@ -3,9 +3,9 @@
 // ============================================
 
 import { player } from '../player.js';
-import { iceCubes } from '../obstacles.js';
+import { iceCubes, getCubeDrawY } from '../obstacles.js';
 import { monsters, bullets } from '../enemies.js';
-import { xmasStar, xmasTree } from '../collectibles.js';
+import { xmasStar, xmasTree, sonic, getSonicDrawY } from '../collectibles.js';
 import { GAME_STATE } from '../config.js';
 import * as GameState from '../gameState.js';
 
@@ -15,14 +15,16 @@ export function checkCollisions() {
 
     iceCubes.forEach((cube, index) => {
         // Simple AABB collision detection
+        // Use the cube's current draw Y (floating)
+        const cubeDrawY = getCubeDrawY(cube);
         if (player.x < cube.x + cube.width &&
             player.x + player.width > cube.x &&
-            player.y < cube.y + cube.height &&
-            player.y + player.height > cube.y) {
+            player.y < cubeDrawY + cube.height &&
+            player.y + player.height > cubeDrawY) {
 
             // Landing on top of cube - add points if not visited
-            if (player.velocityY > 0 && player.y + player.height - player.velocityY < cube.y + 5) {
-                player.y = cube.y - player.height;
+            if (player.velocityY > 0 && player.y + player.height - player.velocityY < cubeDrawY + 5) {
+                player.y = cubeDrawY - player.height;
                 player.velocityY = 0;
                 player.isJumping = false;
                 player.jumpCount = 0;
@@ -94,6 +96,7 @@ export function checkCollisions() {
     if (!xmasStar.collected &&
         player.x < xmasStar.x + xmasStar.width &&
         player.x + player.width > xmasStar.x &&
+        // use static star y
         player.y < xmasStar.y + xmasStar.height &&
         player.y + player.height > xmasStar.y) {
         xmasStar.collected = true;
@@ -102,20 +105,85 @@ export function checkCollisions() {
         GameState.addScore(2000); // +2000 points for collecting the star
     }
 
-    // Check win condition (jump on top of Christmas tree)
-    if (player.x < xmasTree.x + xmasTree.width &&
-        player.x + player.width > xmasTree.x &&
-        player.y < xmasTree.y + xmasTree.height &&
-        player.y + player.height > xmasTree.y) {
+    // Check sonic badge collision (allow touching or jumping to collect)
+    const sonicDrawY = getSonicDrawY();
+    if (!sonic.collected &&
+        player.x < sonic.x + sonic.width &&
+        player.x + player.width > sonic.x &&
+        player.y < sonicDrawY + sonic.height &&
+        player.y + player.height > sonicDrawY) {
+        sonic.collected = true;
+        GameState.setSonicCollected(true);
+        GameState.addScore(500); // +500 points for sonic badge
+    }
 
-        // Must land on top of tree
-        if (player.velocityY > 0 && player.y < xmasTree.y + 20) {
-            xmasTree.hasWon = true;
-            GameState.setCurrentState(GAME_STATE.WIN_CELEBRATION);
-            GameState.setCelebrationTimer(Date.now());
-            GameState.setCelebrationMessage("You have successfully saved the Sonunu's Town from demonic Grinch Sonunu!");
-            if (GameState.gameEndTime === null) {
-                GameState.setGameEndTime(Date.now());
+    // Check win condition (jump on top of Christmas tree)
+    // Only allow winning if the player has collected the star
+    if (GameState.starCollected) {
+        // Touching/overlapping the tree
+        if (player.x < xmasTree.x + xmasTree.width &&
+            player.x + player.width > xmasTree.x &&
+            player.y < xmasTree.y + xmasTree.height &&
+            player.y + player.height > xmasTree.y) {
+
+            // Landing on top of tree = WIN
+            if (player.velocityY > 0 && player.y + player.height - player.velocityY < xmasTree.y + 5) {
+                player.y = xmasTree.y - player.height;
+                player.velocityY = 0;
+                xmasTree.hasWon = true;
+                GameState.setLevelEnded(true);
+                GameState.setCurrentState(GAME_STATE.WIN_CELEBRATION);
+                GameState.setCelebrationTimer(Date.now());
+                GameState.setCelebrationMessage("You have successfully saved the Sonunu's Town from demonic Grinch Sonunu!");
+                if (GameState.gameEndTime === null) {
+                    GameState.setGameEndTime(Date.now());
+                }
+            }
+            // Hit from right (moving left into tree)
+            else if (player.velocityX < 0 && player.x + player.width - player.velocityX > xmasTree.x + xmasTree.width - 5) {
+                player.x = xmasTree.x + xmasTree.width;
+                player.velocityX = 0;
+            }
+            // Hit from left (moving right into tree)
+            else if (player.velocityX > 0 && player.x - player.velocityX < xmasTree.x + 5) {
+                player.x = xmasTree.x - player.width;
+                player.velocityX = 0;
+            }
+            // Hit from bottom (jumping into tree from below)
+            else if (player.velocityY < 0) {
+                player.y = xmasTree.y + xmasTree.height;
+                player.velocityY = 0;
+            }
+        }
+    } else {
+        // If star not collected, tree acts as a wall (block all collisions including jumping over)
+        if (player.x < xmasTree.x + xmasTree.width &&
+            player.x + player.width > xmasTree.x &&
+            player.y < xmasTree.y + xmasTree.height &&
+            player.y + player.height > xmasTree.y) {
+
+            // Hit from left (moving right into tree)
+            if (player.velocityX > 0 && player.x - player.velocityX < xmasTree.x + 5) {
+                player.x = xmasTree.x - player.width;
+                player.velocityX = 0;
+            }
+            // Hit from right (moving left into tree)
+            else if (player.velocityX < 0 && player.x + player.width - player.velocityX > xmasTree.x + xmasTree.width - 5) {
+                player.x = xmasTree.x + xmasTree.width;
+                player.velocityX = 0;
+            }
+            // Hit from bottom (jumping into tree from below)
+            else if (player.velocityY < 0) {
+                player.y = xmasTree.y + xmasTree.height;
+                player.velocityY = 0;
+            }
+            // Hit from top (jumping over/landing on tree without star)
+            else if (player.velocityY > 0) {
+                player.y = xmasTree.y - player.height;
+                player.velocityY = 0;
+                player.isJumping = false;
+                player.jumpCount = 0;
+                player.onGround = true;
             }
         }
     }

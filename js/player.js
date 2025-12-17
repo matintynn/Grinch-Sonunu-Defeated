@@ -2,6 +2,8 @@ import { GROUND_LEVEL, PLAYER_CONFIG } from './config.js';
 import { keys, touch } from './utils/input.js';
 import { images } from './imageLoader.js';
 import { ctx } from './canvas.js';
+import * as GameState from './gameState.js';
+import { xmasTree } from './collectibles.js';
 
 export const player = {
     x: 100,
@@ -18,7 +20,8 @@ export const player = {
     onGround: false,
     isMoving: false,
     hasStar: false,
-    jumpHeights: PLAYER_CONFIG.jumpHeights
+    jumpHeights: PLAYER_CONFIG.jumpHeights,
+    facingRight: true // Track horizontal direction
 };
 
 export function updatePlayer() {
@@ -26,9 +29,11 @@ export function updatePlayer() {
     if (keys['ArrowRight']) {
         player.velocityX = player.speed;
         player.isMoving = true;
+        player.facingRight = true;
     } else if (keys['ArrowLeft']) {
         player.velocityX = -player.speed;
         player.isMoving = true;
+        player.facingRight = false;
     } else {
         player.velocityX = 0;
         player.isMoving = false;
@@ -43,9 +48,11 @@ export function updatePlayer() {
             if (deltaX > 0) {
                 player.velocityX = player.speed;
                 player.isMoving = true;
+                player.facingRight = true;
             } else {
                 player.velocityX = -player.speed;
                 player.isMoving = true;
+                player.facingRight = false;
             }
         }
 
@@ -72,6 +79,10 @@ export function updatePlayer() {
     }
 
     if (player.x < 0) player.x = 0;
+    // Prevent moving past tree (max 120px beyond tree)
+    const maxPlayerX = xmasTree.x + xmasTree.width + 120;
+    if (player.x > maxPlayerX) player.x = maxPlayerX;
+    // Collision detection will handle tree interactions (landing on top, side blocking)
 }
 
 export function handleJump() {
@@ -91,7 +102,17 @@ export function drawPlayer() {
     } else {
         playerImage = images.sonunuNormal;
     }
-    ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+
+    // Draw with horizontal flip if facing left
+    if (!player.facingRight) {
+        ctx.save();
+        ctx.translate(player.x + player.width, player.y);
+        ctx.scale(-1, 1);
+        ctx.drawImage(playerImage, 0, 0, player.width, player.height);
+        ctx.restore();
+    } else {
+        ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+    }
 }
 
 export function resetPlayer() {

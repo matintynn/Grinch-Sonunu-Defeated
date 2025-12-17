@@ -10,9 +10,38 @@ import { drawGame } from './gameScreen.js';
 import * as GameState from '../gameState.js';
 import { themeColors, themeFonts } from '../themeColors.js';
 
+// Floating animation state (same as start screen)
+let floatingOffset = 0;
+let floatingDirection = 1;
+
+function drawFloatingSonic() {
+    // Update floating animation
+    floatingOffset += 0.3 * floatingDirection;
+    if (floatingOffset > 15) floatingDirection = -1;
+    if (floatingOffset < -15) floatingDirection = 1;
+
+    // Sonic badge size and position (match startScreen)
+    const sonicSize = 70;
+    const sonicX = canvas.width / 2 - sonicSize / 2;
+    const sonicY = canvas.height / 6 - sonicSize / 2 + floatingOffset;
+
+    // Draw glow effect
+    ctx.shadowColor = 'rgba(255, 200, 0, 0.6)';
+    ctx.shadowBlur = 10;
+
+    // Draw sonic badge
+    ctx.drawImage(images.sonic, sonicX, sonicY, sonicSize, sonicSize);
+
+    // Reset shadow
+    ctx.shadowBlur = 0;
+}
+
 export function drawWinCelebration() {
     // Keep showing the game with completed tree
     drawGame();
+
+    // Floating Sonic on celebration screen
+    drawFloatingSonic();
 
     // Typewriter effect
     const elapsedTime = Date.now() - GameState.celebrationTimer;
@@ -166,6 +195,9 @@ export function drawEndScene() {
     // Draw gradient background
     drawGradientBackground();
 
+    // Floating Sonic on end scene (same position as start)
+    drawFloatingSonic();
+
     // Draw ground (darker snow color) - 40px height
     ctx.fillStyle = themeColors.bgGround;
     ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
@@ -187,40 +219,62 @@ export function drawEndScene() {
     // Add noise effect
     drawNoiseEffect();
 
-    // Victory message
-    ctx.fillStyle = themeColors.accentBorderDialog;
-    ctx.font = `bold ${themeFonts.title} ${themeFonts.fancy}`;
-    ctx.textAlign = 'center';
-    ctx.shadowColor = 'black';
-    ctx.shadowBlur = 15;
-    ctx.fillText('Christmas Saved!', canvas.width / 2, 60);
-
+    // Victory message - centered vertically and horizontally
     // Calculate bonus points
     let bonusScore = GameState.playerScore;
     if (GameState.gameStartTime && GameState.gameEndTime === null) {
         GameState.setGameEndTime(Date.now());
     }
-    const elapsedTime = (GameState.gameEndTime - GameState.gameStartTime) / 1000; // Convert to seconds
+    const elapsedTime = (GameState.gameEndTime - GameState.gameStartTime) / 1000; // seconds
+    if (elapsedTime < 22) bonusScore += 1000;
 
-    // Add bonus if completed in less than 20 seconds
+    const titleText = 'Christmas Saved!';
+    const scoreText = `Score: ${bonusScore}`;
+    const bonusText = `+1000 Bonus (less than 22s)`;
+    const promptText = 'Press ENTER to Play Again';
+
+    const titleFont = `bold ${themeFonts.title} ${themeFonts.fancy}`;
+    const scoreFont = `bold ${themeFonts.medium} ${themeFonts.fancy}`;
+    const promptFont = `${themeFonts.medium} ${themeFonts.fancy}`;
+    const lineSpacing = 8;
+
+    const lines = [
+        { text: titleText, font: titleFont, color: themeColors.accentBorderDialog, shadow: 10 },
+        { text: scoreText, font: scoreFont, color: themeColors.goldPrimary, shadow: 0 },
+    ];
     if (elapsedTime < 20) {
-        bonusScore += 1000;
+        lines.push({ text: bonusText, font: scoreFont, color: themeColors.goldPrimary, shadow: 0 });
     }
+    lines.push({ text: promptText, font: promptFont, color: themeColors.whitePrimary, shadow: 10 });
 
-    ctx.fillStyle = themeColors.goldPrimary;
-    ctx.font = `bold ${themeFonts.xlarge} ${themeFonts.fancy}`;
-    ctx.fillText(`Score: ${bonusScore}`, canvas.width / 2, 100);
+    // Measure total block height
+    let totalHeight = 0;
+    const sizes = lines.map(l => {
+        const m = l.font.match(/(\d+)px/);
+        const size = m ? parseInt(m[1], 10) : parseInt(themeFonts.medium, 10) || 16;
+        totalHeight += size + lineSpacing;
+        return size;
+    });
+    totalHeight -= lineSpacing; // remove last spacing
 
-    // Show bonus message if applicable
-    if (elapsedTime < 20) {
-        ctx.fillStyle = themeColors.goldPrimary;
-        ctx.font = `bold ${themeFonts.large} ${themeFonts.fancy}`;
-        ctx.fillText(`+1000 Bonus (< 20s)`, canvas.width / 2, 125);
+    // Starting Y to center block
+    let y = Math.round(canvas.height / 2 - totalHeight / 2) - 70;
+
+    ctx.textAlign = 'center';
+    // Draw each line
+    for (let i = 0; i < lines.length; i++) {
+        const l = lines[i];
+        const sz = sizes[i];
+        ctx.font = l.font;
+        ctx.fillStyle = l.color;
+        if (l.shadow) {
+            ctx.shadowColor = 'black';
+            ctx.shadowBlur = l.shadow;
+        } else {
+            ctx.shadowBlur = 0;
+        }
+        ctx.fillText(l.text, canvas.width / 2, y + sz / 2);
+        y += sz + lineSpacing;
     }
-
-    ctx.fillStyle = themeColors.whitePrimary;
-    ctx.font = `${themeFonts.large} ${themeFonts.fancy}`;
-    ctx.shadowBlur = 10;
-    ctx.fillText('Press ENTER to Play Again', canvas.width / 2, 155);
     ctx.shadowBlur = 0;
 }
