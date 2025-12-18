@@ -72,7 +72,7 @@ function drawSnowOnGroundLayer1() {
 
 function drawSnowOnGroundLayer2() {
     // CUSTOMIZE THESE VALUES to change the snow appearance
-    const snowHeight = 6;        // Height of snow layer (try 6-12)
+    const snowHeight = 7;        // Height of snow layer (try 6-12)
     const waveHeight = 4;          // How tall the waves are (try 2-6)
     const waveFrequency = 0.02;    // How many waves (try 0.01-0.04)
 
