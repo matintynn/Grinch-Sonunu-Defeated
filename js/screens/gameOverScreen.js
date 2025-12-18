@@ -7,6 +7,7 @@ import * as GameState from '../gameState.js';
 import { themeColors, themeFonts } from '../themeColors.js';
 
 export function drawGameOver() {
+
     ctx.fillStyle = themeColors.bgOverlay;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 

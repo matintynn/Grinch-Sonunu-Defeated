@@ -4,7 +4,7 @@
 
 import { canvas, ctx } from '../canvas.js';
 import { images } from '../imageLoader.js';
-import { drawGradientBackground, drawNoiseEffect } from '../background.js';
+import { drawGradientBackground, drawNoiseEffect, drawGround } from '../background.js';
 import { drawSnowflakes } from '../snowEffect.js';
 import * as GameState from '../gameState.js';
 import { themeColors, themeFonts } from '../themeColors.js';
@@ -20,10 +20,6 @@ export function drawStartScreen() {
     // Draw gradient background
     drawGradientBackground();
 
-    // Draw ground (darker snow color) - 40px height
-    ctx.fillStyle = themeColors.bgGround;
-    ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
-
     // Calculate image dimensions (full height responsive, aligned to bottom)
     const targetHeight = canvas.height - 40;
     const imgRatio = images.startSceneElement.width / images.startSceneElement.height;
@@ -31,9 +27,12 @@ export function drawStartScreen() {
 
     // Position: centered horizontally, aligned to bottom above ground
     const drawX = (canvas.width - targetWidth) / 2;
-    const drawY = canvas.height - 40 - targetHeight;
+    const drawY = canvas.height - 40 - targetHeight - 18;
 
     ctx.drawImage(images.startSceneElement, drawX, drawY, targetWidth, targetHeight);
+
+    // Draw ground with snowy effect
+    drawGround();
 
     // Draw floating Sonic badge in center
     drawFloatingSonic();
@@ -114,7 +113,7 @@ function drawPressEnterWithBorder() {
     const textHeight = parseInt(fontSize);
 
     const x = canvas.width / 2;
-    const y = 236;
+    const y = 228;
 
     // Draw border rectangle around text
     const padding = 30;
