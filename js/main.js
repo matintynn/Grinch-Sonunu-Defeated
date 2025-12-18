@@ -14,6 +14,7 @@ import { drawStartScreen } from './screens/startScreen.js';
 import { drawGame } from './screens/gameScreen.js';
 import { drawGameOver } from './screens/gameOverScreen.js';
 import { drawWinCelebration, drawRewardScene, drawEndScene } from './screens/winScreen.js';
+import { drawReadMeButton, drawReadMePopup } from './ui/readMePopup.js';
 import { GAME_STATE } from './config.js';
 import * as GameState from './gameState.js';
 
@@ -33,10 +34,12 @@ function resetGame() {
 }
 
 // Main game loop
+// Main game loop
 function gameLoop() {
     if (GameState.currentState === GAME_STATE.START) {
         updateSnowflakes();
         drawStartScreen();
+        drawReadMeButton();
 
         // Handle start game
         if (keys['Enter']) {
@@ -52,18 +55,23 @@ function gameLoop() {
         }
     }
     else if (GameState.currentState === GAME_STATE.PLAYING) {
-        updateSnowflakes();
-        handleJump();
-        updatePlayer();
-        updateCamera();
-        updateMonsters();
-        updateBullets(camera.x);
-        checkCollisions();
+        // Only update game logic if Read Me popup is not showing
+        if (!GameState.showReadMePopup) {
+            updateSnowflakes();
+            handleJump();
+            updatePlayer();
+            updateCamera();
+            updateMonsters();
+            updateBullets(camera.x);
+            checkCollisions();
+        }
         drawGame();
+        drawReadMeButton();
     }
     else if (GameState.currentState === GAME_STATE.WIN_CELEBRATION) {
         updateSnowflakes();
         drawWinCelebration();
+        drawReadMeButton();
 
         if (keys['Enter']) {
             GameState.setCurrentState(GAME_STATE.REWARD_SCENE);
@@ -74,6 +82,7 @@ function gameLoop() {
     else if (GameState.currentState === GAME_STATE.REWARD_SCENE) {
         updateSnowflakes();
         drawRewardScene();
+        drawReadMeButton();
 
         if (keys['Enter']) {
             GameState.setCurrentState(GAME_STATE.END_SCENE);
@@ -84,6 +93,7 @@ function gameLoop() {
     else if (GameState.currentState === GAME_STATE.END_SCENE) {
         updateSnowflakes();
         drawEndScene();
+        drawReadMeButton();
 
         if (keys['Enter']) {
             GameState.setCurrentState(GAME_STATE.START);
@@ -93,12 +103,18 @@ function gameLoop() {
     }
     else if (GameState.currentState === GAME_STATE.GAME_OVER) {
         drawGameOver();
+        drawReadMeButton();
 
         if (keys['Enter']) {
             GameState.setCurrentState(GAME_STATE.PLAYING);
             resetGame();
             keys['Enter'] = false;
         }
+    }
+
+    // Draw Read Me popup overlay (on top of everything)
+    if (GameState.showReadMePopup) {
+        drawReadMePopup();
     }
 
     requestAnimationFrame(gameLoop);

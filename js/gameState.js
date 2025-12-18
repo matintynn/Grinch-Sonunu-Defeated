@@ -15,9 +15,19 @@ export let iceCubesVisited = [];
 export let starCollected = false;
 export let sonicCollected = false;
 export let levelEnded = false;
+export let showReadMePopup = false;
+export let wasPlayingBeforePause = false;
 
 export function setCurrentState(state) {
     currentState = state;
+}
+
+export function setShowReadMePopup(value) {
+    showReadMePopup = value;
+}
+
+export function setWasPlayingBeforePause(value) {
+    wasPlayingBeforePause = value;
 }
 
 export function setShowStartDialog(value) {
@@ -72,6 +82,8 @@ export function resetGameState() {
     rewardSceneStartTime = null;
     gameStartTime = Date.now();
     gameEndTime = null;
+    showReadMePopup = false;
+    wasPlayingBeforePause = false;
 }
 
 export function setStarCollected(value) {
