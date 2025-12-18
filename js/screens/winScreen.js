@@ -4,7 +4,7 @@
 
 import { canvas, ctx } from '../canvas.js';
 import { images } from '../imageLoader.js';
-import { drawGradientBackground, drawNoiseEffect } from '../background.js';
+import { drawGradientBackground, drawNoiseEffect, drawGround } from '../background.js';
 import { drawSnowflakes } from '../snowEffect.js';
 import { drawGame } from './gameScreen.js';
 import * as GameState from '../gameState.js';
@@ -209,9 +209,12 @@ export function drawEndScene() {
 
     // Position: centered horizontally, above ground
     const drawX = (canvas.width - targetWidth) / 2;
-    const drawY = canvas.height - 40 - imgHeight;
+    const drawY = canvas.height - 40 - imgHeight - 18;
 
     ctx.drawImage(images.endSceneElement, drawX, drawY, targetWidth, imgHeight);
+
+    // Draw ground with snowy effect
+    drawGround();
 
     // Draw snow
     drawSnowflakes();
