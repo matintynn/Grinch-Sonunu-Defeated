@@ -41,13 +41,39 @@ export function drawGround() {
     ctx.fillRect(0, GROUND_LEVEL, canvas.width, GROUND_HEIGHT);
 
     // Draw wavy snow on top of ground
-    drawSnowOnGround();
+    drawSnowOnGroundLayer1();
+    drawSnowOnGroundLayer2();
 }
 
-function drawSnowOnGround() {
+function drawSnowOnGroundLayer1() {
     // CUSTOMIZE THESE VALUES to change the snow appearance
     const snowHeight = 11;        // Height of snow layer (try 6-12)
     const waveHeight = 5;          // How tall the waves are (try 2-6)
+    const waveFrequency = 0.02;    // How many waves (try 0.01-0.04)
+
+    ctx.fillStyle = themeColors.layersnow; // White snow color
+    ctx.beginPath();
+
+    // Start at the left side of ground
+    ctx.moveTo(0, GROUND_LEVEL);
+
+    // Create wavy top edge using sine wave
+    for (let x = 0; x <= canvas.width; x += 2) {
+        const y = GROUND_LEVEL + Math.sin(x * waveFrequency) * waveHeight;
+        ctx.lineTo(x, y);
+    }
+
+    // Complete the shape (go down, across, and back up)
+    ctx.lineTo(canvas.width, GROUND_LEVEL + snowHeight);
+    ctx.lineTo(0, GROUND_LEVEL + snowHeight);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawSnowOnGroundLayer2() {
+    // CUSTOMIZE THESE VALUES to change the snow appearance
+    const snowHeight = 6;        // Height of snow layer (try 6-12)
+    const waveHeight = 4;          // How tall the waves are (try 2-6)
     const waveFrequency = 0.02;    // How many waves (try 0.01-0.04)
 
     ctx.fillStyle = themeColors.accentSnow; // White snow color

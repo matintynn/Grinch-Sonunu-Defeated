@@ -32,7 +32,8 @@ export const themeColors = {
     // ACCENT COLORS
     accentBorder: getCSSVar('--color-accent-border'),
     accentBorderDialog: getCSSVar('--color-accent-border-dialog'),
-    accentSnow: getCSSVar('--color-accent-snow')
+    accentSnow: getCSSVar('--color-accent-snow'),
+    layersnow: getCSSVar('--color-layer-snow')
 };
 
 // Initialize theme fonts from CSS variables
